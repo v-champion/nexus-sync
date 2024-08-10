@@ -1,0 +1,6 @@
+{
+    "luau-lsp.require.directoryAliases": {
+        "@NewAlias/": "new/path"
+    },
+    "luau-lsp.require.fileAliases": {}
+}
