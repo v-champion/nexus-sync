@@ -18,9 +18,10 @@
   "icon": "icon.png",
   "version": "0.1.2",
   "engines": {
-    "vscode": "^1.91.0"[
+    "vscode": "^1.91.0"
   },
   "categories": [
+    "Debuggers",
     "Other"
   ],
   "activationEvents": ["onStartupFinished"],

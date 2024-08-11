@@ -8,6 +8,8 @@ Displays Roblox Studio output to an output channel in Visual Studio Code, with a
 
 * Supports multi place Rojo projects for clickable stack trace file sources whenever scripts error in the output.
 
+![VSCode output view](image.png)
+
 ## Installation
 
 * Install the Visual Studio Code extension
