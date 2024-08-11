@@ -28,7 +28,11 @@ function Interface:Apply(GuiObject, Data)
 	end
 end
 
-function Interface:Tween(GuiObject, Data, Duration)
+function Interface:Tween(GuiObject: GuiObject, Data: {}, Duration: number?)
+	if not Duration then
+		Duration = 0.2
+	end
+	
 	if Data[GuiObject.ClassName] then
 		Tween(GuiObject, Data[GuiObject.ClassName], Duration)
 	end

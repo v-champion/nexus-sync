@@ -11,7 +11,7 @@ let server;
 
 function parseOutputLogs(body) {
     const {StartTime, Cleared, PlaceId, Logs} = JSON.parse(body);
-    console.log(StartTime);
+    //console.log(StartTime);
 
     if (Cleared) {
         //console.log("Cleared logs");
@@ -52,40 +52,44 @@ function parseOutputLogs(body) {
 }
 
 function startServer(port) {
-    output.start();
+    if (!isServerRunning()) {
+        output.start();
 
-    server = http.createServer((req, res) => {
-        if (req.method === 'POST' && req.url === '/data') {
-            let body = '';
+        server = http.createServer((req, res) => {
+            if (req.method === 'POST' && req.url === '/data') {
+                let body = '';
 
-            req.on('data', (chunk) => {
-              body += chunk.toString();
-            });
+                req.on('data', (chunk) => {
+                body += chunk.toString();
+                });
 
-            req.on('end', () => {
-                try {
-                    parseOutputLogs(body);
+                req.on('end', () => {
+                    try {
+                        parseOutputLogs(body);
 
-                    res.writeHead(200, contentType);
-                    res.end(JSON.stringify({message: 'Data received successfully'}));
+                        res.writeHead(200, contentType);
+                        res.end(JSON.stringify({message: 'Data received successfully'}));
 
-                } catch (err) {
-                    console.log(err);
+                    } catch (err) {
+                        console.log(err);
 
-                    res.writeHead(400, contentType);
-                    res.end(JSON.stringify({error: 'Invalid JSON data'}));
-                }
-            });
-        } else {
-            res.writeHead(404, contentType);
-            res.end(JSON.stringify({error: 'Endpoint not found'}));
-        }
-    });
-    
-    server.listen(port, () => {
-        notification.send(`Nexus Sync plugin server running on port ${port}`);
-        console.log(`Nexus Sync: Server running at http://localhost:${port}/`);
-    });
+                        res.writeHead(400, contentType);
+                        res.end(JSON.stringify({error: 'Invalid JSON data'}));
+                    }
+                });
+            } else {
+                res.writeHead(404, contentType);
+                res.end(JSON.stringify({error: 'Endpoint not found'}));
+            }
+        });
+        
+        server.listen(port, () => {
+            notification.send(`Nexus Sync plugin server running on port ${port}`);
+            console.log(`Nexus Sync: Server running at http://localhost:${port}/`);
+        });
+    } else {
+        notification.send(`Nexus Sync plugin server is already running`);
+    }
 }
 
 function stopServer() {
@@ -96,6 +100,10 @@ function stopServer() {
         });
     }
     output.stop();
+}
+
+function isServerRunning() {
+    return server && server.listening; // Check if the server is defined and listening
 }
 
 module.exports = {

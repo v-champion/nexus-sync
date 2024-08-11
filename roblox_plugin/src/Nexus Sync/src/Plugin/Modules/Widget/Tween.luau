@@ -12,6 +12,6 @@ return function (Object, Goal, Duration, Style, Direction)
 	
 	local Animation = TweenService:Create(Object, TweenData, Goal)
 	Animation:Play()
-
+	
 	return Animation
 end

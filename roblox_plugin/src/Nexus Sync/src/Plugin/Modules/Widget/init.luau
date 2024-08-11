@@ -10,7 +10,6 @@ local Gui = require(script.Gui)
 local Widget = {}
 
 local button = toolbar:CreateButton("Nexus Sync", "Open the widget", "rbxassetid://18892374862")
-button.ClickableWhenViewportHidden = true
 
 local widgetInfo = DockWidgetPluginGuiInfo.new(
 	Enum.InitialDockState.Float, false, false, 250, 230
@@ -21,8 +20,13 @@ widgetGui.Title = "Nexus Sync"
 widgetGui.Name = "Nexus Sync"
 
 local Frame = Gui()
+Frame.Size = UDim2.fromScale(1, 1)
 Frame.Visible = true
 Frame.Parent = widgetGui
+
+widgetGui:GetPropertyChangedSignal("Enabled"):Connect(function()
+	button:SetActive(widgetGui.Enabled)
+end)
 
 button.Click:Connect(function()
 	widgetGui.Enabled = not widgetGui.Enabled
@@ -46,7 +50,7 @@ end
 
 local function UpdateStatus(Type)
 	local Data = Interface:Get("Status")
-	Interface:Tween(Frame.Status, Data[Type], 1/30)
+	Interface:Tween(Frame.Status, Data[Type])
 	
 	local Text = Interface:Get("Text")
 	Frame.Status.Label.Text = Text[Type]
@@ -54,7 +58,7 @@ end
 
 local function UpdateConnectButton(Toggle, Text)
 	local Data = Interface:Get("Status")["Connect"]
-	Interface:Tween(Frame.Connect, Data[Toggle], 0.1)
+	Interface:Tween(Frame.Connect, Data[Toggle])
 	
 	Frame.Connect.AutoButtonColor = Toggle
 	Frame.Connect.Label.Text = Text
@@ -131,6 +135,11 @@ function Widget:Load()
 			UpdateStatus("Disconnected")	
 		end
 	end)
+
+	if Settings.autoConnect then
+		UpdateConnectButton(false, "Connect")
+		UpdateStatus("Connecting")
+	end
 end
 
 return Widget

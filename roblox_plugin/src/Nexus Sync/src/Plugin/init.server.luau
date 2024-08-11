@@ -1,3 +1,5 @@
+plugin.Name = script.Parent.Name
+
 local Settings = require(script.Modules.Settings)
 local Cleanup = require(script.Modules.Cleanup)
 local Widget = require(script.Modules.Widget)

@@ -11,8 +11,6 @@ local Output = {}
 Output.LogCount = 0
 Output.Busy = false
 
-warn(plugin.Name)
-
 function Output:Sanitize()
 	local LogHistory, Logs = LogService:GetLogHistory(), {}
 	

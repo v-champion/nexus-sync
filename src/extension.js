@@ -10,7 +10,7 @@ const output = require('./output');
 function activate(context) {
 	console.log('Nexus Sync: extension is running');
 	
-	let openFile = vscode.commands.registerCommand('nexus-toolset.openFile', (filePath, line) => {
+	let openFile = vscode.commands.registerCommand('nexus-sync.openFile', (filePath, line) => {
         const uri = vscode.Uri.file(filePath);
 
         vscode.workspace.openTextDocument(uri).then(doc => {
@@ -24,29 +24,33 @@ function activate(context) {
         });
     });
 
+    let startServer = vscode.commands.registerCommand('nexus-sync.startServer', () => {
+        server.startServer(settings.fetch('plugin', 'port'));
+    });
+
+    let stopServer = vscode.commands.registerCommand('nexus-sync.stopServer', () => {
+        server.stopServer();
+    });
+
     const linkProvider = vscode.languages.registerDocumentLinkProvider({ scheme: 'output' }, {
         provideDocumentLinks(document) {
             return output.documentLinks(document);   
         }
     });
 
-    const settingChanged = vscode.workspace.onDidChangeConfiguration(event => {
-        const affectedConfiguration = settings.changedConfiguration(event);
+    // const settingChanged = vscode.workspace.onDidChangeConfiguration(event => {
+    //     const affectedConfiguration = settings.changedConfiguration(event);
 
-        if (affectedConfiguration == "plugin") {
-            if (settings.fetch('plugin', 'enabled')) {
-                server.startServer(settings.fetch('plugin', 'port'));
-            } else {
-                server.stopServer();
-            }
-        }
-    });
+    //     if (affectedConfiguration == "server") {
+    //         if (settings.fetch('server', 'autoStart')) {
+    //             server.startServer(settings.fetch('plugin', 'port'));
+    //         }
+    //     }
+    // });
 
-    context.subscriptions.push(
-        openFile, linkProvider, settingChanged
-    );
+    context.subscriptions.push(openFile, linkProvider, startServer, stopServer);
 
-    if (settings.fetch('plugin', 'enabled')) {
+    if (settings.fetch('server', 'autoStart')) {
         server.startServer(settings.fetch('plugin', 'port'));
     }
 }

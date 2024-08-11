@@ -357,7 +357,7 @@ return function()
 	Icon1.BackgroundTransparency = 1
 	Icon1.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Icon1.BorderSizePixel = 0
-	Icon1.Image = "http://www.roblox.com/asset/?id=18892566181"
+	Icon1.Image = "http://www.roblox.com/asset/?id=18904285408"
 	Icon1.Position = UDim2.fromScale(0.5, 0.5)
 	Icon1.Size = UDim2.fromOffset(21, 21)
 	Icon1.ZIndex = 3
