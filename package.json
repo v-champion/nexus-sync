@@ -3,7 +3,17 @@
   "displayName": "Roblox Nexus Sync",
   "description": "Allows you to sync your Roblox Studio output with Visual Studio Code",
   "publisher": "v-champion",
-  "author": "v-champion",
+  "author": {
+    "name": "V_Champion",
+    "url": "https://github.com/v-champion"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/v-champion/nexus-sync"
+  },
+  "bugs": {
+    "url": "https://github.com/v-champion/nexus-sync/issues"
+  },
   "license": "MIT",
   "icon": "icon.png",
   "version": "0.1.0",
