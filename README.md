@@ -17,13 +17,12 @@ Displays Roblox Studio output to an output channel in Visual Studio Code, with a
 
 ## Usage
 
-By default, the server does not start automatically when you install the extension. You can manually start/stop the server by opening the command palette and running the "**Nexus Sync**" commands.
+* Start the server by running the `Nexus Sync: Start Server` command
+* Navigate to `View > Output`, click on the dropdown, and select `Roblox Studio`
+* Next to the dropdown, click the settings cog icon and select `Trace`, then select `Set As Default`
+* Open your place in Roblox Studio, and you should be connected!
 
-You can make the server automatically start by enabling the `nexus-sync.server.autoStart` configuration. It is recommended you only enable this for workspace only.
-
-**Highly Recommended if logs appear missing or incomplete:**
-
-In VS Code, set your output **Log Level** to "Trace" and then "Set As Default" by clicking the settings cog next to the output channels dropdown.
+If you want Nexus Sync to start automatically, right click the extension and select `Extension Settings`, then enable the `Auto Start` setting. It is recommended you enable this in your workspace settings only!
 
 ## Extra Notes
 This extension relies on your Rojo sourcemap file(s) to locate scripts that error, so if it does not exist, your output  will not contain clickable output text for script errors, but otherwise should run as normal.

@@ -7,9 +7,14 @@ local Server = require(script.Parent.Server)
 local Interface = require(script.Interface)
 local Gui = require(script.Gui)
 
-local Widget = {}
+local Widget = {
+	["Icons"] = {
+		[false] = "rbxassetid://18905679801";
+		[true] = "rbxassetid://18905678175",
+	}
+}
 
-local button = toolbar:CreateButton("Nexus Sync", "Open the widget", "rbxassetid://18892374862")
+local button = toolbar:CreateButton("Nexus Sync", "Open the widget", Widget.Icons[false])
 
 local widgetInfo = DockWidgetPluginGuiInfo.new(
 	Enum.InitialDockState.Float, false, false, 250, 230
@@ -79,8 +84,12 @@ local function Disconnect()
 	end
 end
 
-function Widget:Close()
-	widgetGui.Enabled = false
+function Widget:Update()
+	if Server.Connected then
+		if (os.time() - Server.LastUpdate) >= 5 then
+			Server:Update()
+		end
+	end
 end
 
 function Widget:Load()	
@@ -126,6 +135,8 @@ function Widget:Load()
 	end)
 	
 	Server.Changed:Connect(function(Connected)
+		button.Icon = Widget.Icons[Connected == true]
+
 		if Connected then
 			UpdateConnectButton(true, "Disconnect")
 			UpdateStatus("Connected")	
@@ -140,6 +151,10 @@ function Widget:Load()
 		UpdateConnectButton(false, "Connect")
 		UpdateStatus("Connecting")
 	end
+end
+
+function Widget:Close()
+	widgetGui.Enabled = false
 end
 
 return Widget

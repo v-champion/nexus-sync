@@ -33,7 +33,7 @@ async function documentLinks(document) {
                         const start = document.positionAt(scriptLocationIndex);
                         const end = document.positionAt(scriptLocationIndex + scriptLocation.length);
 
-                        const uri = vscode.Uri.parse(`command:nexus-toolset.openFile?${encodeURIComponent(JSON.stringify([filePath, lineNumber]))}`);
+                        const uri = vscode.Uri.parse(`command:nexus-sync.openFile?${encodeURIComponent(JSON.stringify([filePath, lineNumber]))}`);
 
                         const link = new vscode.DocumentLink(new vscode.Range(start, end), uri);
                         link.tooltip = "Open Script in Editor";

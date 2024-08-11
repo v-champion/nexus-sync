@@ -44,7 +44,9 @@ function Output:Flush()
 	
 	if not Output.Busy or Server.Ready then
 		Output.Busy = true
+
 		Server.Ready = false
+		Server.LastUpdate = os.time()
 		
 		local Data = {
 			["StartTime"] = Server.StartTime;
@@ -52,7 +54,7 @@ function Output:Flush()
 			["Cleared"] = Cleared;
 			["Logs"] = Logs
 		}
-				
+
 		if not Http:Post(Data) then
 			Server:Connect(true)
 		end
@@ -78,7 +80,7 @@ function Output:Load()
 		end
 				
 		if not Server.Connected then
-			if not Server.Connecting then
+			if not Server.Connecting and Settings.autoConnect then
 				Server:Connect()
 			end
 			return

@@ -25,7 +25,7 @@ function Http:Post(Data)
             return false
 		end)
         
-		if Success and Result.Success then
+		if Success and Result and Result.Success then
 			return true
 		else
 			warn("[Nexus Sync]: " .. Result)

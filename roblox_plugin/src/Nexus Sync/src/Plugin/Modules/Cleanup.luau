@@ -1,27 +1,27 @@
 local ScriptEditorService = game:GetService("ScriptEditorService")
 
-local Connections = {}
-Connections.Functions = {}
-Connections.List = {}
+local Cleanup = {}
+Cleanup.Functions = {}
+Cleanup.List = {}
 
-function Connections:Hook(Service: string | nil, Tag: string | nil)
+function Cleanup:Hook(Service: string | nil, Tag: string | nil)
 	if Service and Tag then
-		Connections.Functions[Service] = Tag
+		Cleanup.Functions[Service] = Tag
 		return true
 	end
-	return Connections.List
+	return Cleanup.List
 end
 
-function Connections:Stop()
-	for Service, Tag in (Connections.Functions) do
+function Cleanup:Clear()
+	for Service, Tag in (Cleanup.Functions) do
 		if Service == "ScriptAnalysisCallback" then
 			ScriptEditorService:DeregisterScriptAnalysisCallback(Tag)
 		end
 	end
     
-	table.clear(Connections.Functions)
+	table.clear(Cleanup.Functions)
 
-	for _, Connection in (Connections.List) do
+	for _, Connection in (Cleanup.List) do
 		if typeof(Connection) == "thread" then
 			task.cancel(Connection)
 		else
@@ -29,7 +29,7 @@ function Connections:Stop()
 		end
 	end
 	
-	table.clear(Connections.List)
+	table.clear(Cleanup.List)
 end
 
-return Connections
+return Cleanup

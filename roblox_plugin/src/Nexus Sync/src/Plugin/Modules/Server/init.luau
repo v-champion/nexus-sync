@@ -3,11 +3,13 @@ local Http = require(script.Parent.Http)
 
 local Signal = require(script.Signal)
 
-local Server = {}
-Server.Changed = Signal.new()
-Server.Disconnected = false
-Server.Connecting = false
-Server.Ready = false
+local Server = {
+	["LastUpdate"] = os.time();
+	["Changed"] = Signal.new();
+	["Disconnected"] = false;
+	["Connecting"] = false;
+	["Ready"] = false;
+}
 
 function Server:Connect(Yield: boolean | nil)
 	if not Server.Connecting then
@@ -33,6 +35,18 @@ function Server:Connect(Yield: boolean | nil)
 	
 	if Yield and Server.Connecting then
 		Server.Changed:Wait()
+	end
+end
+
+function Server:Update()
+	Server.LastUpdate = os.time()
+	
+	if Server.Connected and not Server.Connecting then
+		if Http:Ping() then
+			return
+		end
+		Server.Connected = false
+		Server.Changed:Fire(false)
 	end
 end
 

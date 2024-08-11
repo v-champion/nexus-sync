@@ -10,9 +10,15 @@ Widget:Load()
 Output:Load()
 
 local function Deactivate()
-	Cleanup:Stop()
+	Cleanup:Clear()
 	Widget:Close()
 end
+
+Cleanup:Hook().Ping = task.spawn(function()
+	while task.wait(1) do
+		Widget:Update()
+	end
+end)
 
 plugin.Unloading:Connect(function()
 	Deactivate()
