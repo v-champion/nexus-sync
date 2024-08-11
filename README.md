@@ -1,34 +1,31 @@
-# nexus-toolset README
-
-Internal toolset used for Roblox game development, containing features that help speed up workflow
+# Roblox Nexus Sync
+Displays Roblox Studio output to an output channel in Visual Studio Code, with added Rojo support for click to open script functionality.
+ 
+ Useful for certain Rojo projects where you want to quickly open scripts that error without having to navigate through your folders and file structures.
 
 ## Features
+* Output messages are automatically formatted and colorised depending on message type and your vscode theme, without the need to install external extensions.
 
-Automatically adds require aliases based on sourcemap to workspace settings.
-Adds "Select All" to right click context menu
+* Supports multi place Rojo projects for clickable stack trace file sources whenever scripts error in the output.
 
-## Requirements
+## Installation
 
-Rojo + Luau Language Server
+* Install the Visual Studio Code extension
+* Install the Roblox Plugin via Creator Marketplace or build it yourself from the GitHub repository
 
-## Extension Settings
+## Usage
 
-None at the moment
+By default, the server does not start automatically when you install the extension. 
 
-## Release Notes
+You can manually start/stop the server by opening the command palette and running the "**Nexus Sync**" commands.
 
-### 0.0.4
+You can make the server automatically start by enabling the `nexus-sync.server.autoStart` configuration. It is recommended you only enable this for workspace only.
 
-Added "Roblox Studio" output
+**Highly Recommended:**
 
-### 0.0.3
+In VS Code, set your output **Log Level** to "Trace" and then "Set As Default" by clicking the settings cog next to the output channels dropdown.
 
-Added "Wrap/Unwrap" regions
+## Extra Notes
+This extension relies on your Rojo sourcemap file(s) to locate scripts that error, so if it does not exist, your output  will not contain clickable output text for script errors, but otherwise should run as normal.
 
-### 0.0.2
-
-Added "Select All" in right click menu
-
-### 0.0.1
-
-Added Luau LSP workspace setting editor
+The plugin may become unstable if there are large amounts of output spam, i.e. errors/prints tied to RunService events.

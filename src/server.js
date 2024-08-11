@@ -10,30 +10,38 @@ let stackTrace = false;
 let server;
 
 function parseOutputLogs(body) {
-    const {StartTime, PlaceId, Logs} = JSON.parse(body);
+    const {StartTime, Cleared, PlaceId, Logs} = JSON.parse(body);
+    console.log(StartTime);
 
-    Logs.forEach((log, index) => {
-        if (index + 1 > mostRecentLogIndex) {
-            mostRecentLogIndex = index + 1;
+    if (Cleared) {
+        //console.log("Cleared logs");
+        mostRecentLogIndex = 0;
+    }
+
+    const sortedLogs = Object.entries(Logs).sort((a, b) => Number(a[0]) - Number(b[0]));
+    
+    sortedLogs.forEach(([key, log]) => {
+        const logNumber = Number(key);
+
+        if (logNumber > mostRecentLogIndex) {
+            mostRecentLogIndex = logNumber;
 
             if (log.timestamp >= StartTime) {
-                //console.log(`MessageType: ${log.messageType}, Message: ${log.message}`);
-
                 if (log.message === "Stack Begin") {
                     stackTrace = true;
                 }
-                
+    
                 if (log.message.startsWith("TestService")) {
                     log.message = log.message.replace("TestService: ", "");
                     log.messageType = "MessageDebug";
                 }
-                
+    
                 if (stackTrace) {
                     log.messageType = "MessageTrace";
                 }
-
+    
                 output.logToOutput(PlaceId, log.message, log.messageType);
-                
+    
                 if (log.message === "Stack End") {
                     stackTrace = false;
                 }

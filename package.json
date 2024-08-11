@@ -6,7 +6,7 @@
   "author": "v-champion",
   "license": "MIT",
   "icon": "icon.png",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.91.0"
   },
@@ -17,7 +17,16 @@
   "main": "./src/extension.js",
   "languages": [],
   "contributes": {
-    "commands": [],
+    "commands": [
+      {
+        "command": "nexus-sync.startServer",
+        "title": "Nexus Sync: Start Server"
+      },
+      {
+        "command": "nexus-sync.stopServer",
+        "title": "Nexus Sync: Stop Server"
+      }
+    ],
     "menus": {
       "editor/context": []
     },
@@ -30,10 +39,10 @@
           "description": "Port number to connect to the Studio Plugin",
           "scope": "window"
         },
-        "nexus-toolset.plugin.enabled": {
+        "nexus-sync.server.autoStart": {
           "type": "boolean",
           "default": false,
-          "description": "Enables the Studio Plugin to connect to the extension",
+          "description": "Automatically starts the server on startup",
           "scope": "window"
         }
       }

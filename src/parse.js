@@ -9,16 +9,7 @@ function scriptLocationFromTrace(string) {
 }
 
 function scriptLocationFromError(string) {
-    const regex = /\[.*?\]/;
-    const match = string.match(regex);
-
-    if (match) {
-        const afterPattern = string.split(match[0])[1].trim();
-        const result = afterPattern.split(':')[0].trim();
-
-        return result;
-    }
-    return null;
+    return string.split(':')[0];
 }
 
 function parseScriptLocation(input) {

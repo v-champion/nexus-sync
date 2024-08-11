@@ -8,7 +8,7 @@ const output = require('./output');
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-	console.log('nexus-sync is now active!');
+	console.log('Nexus Sync: extension is running');
 	
 	let openFile = vscode.commands.registerCommand('nexus-toolset.openFile', (filePath, line) => {
         const uri = vscode.Uri.file(filePath);
@@ -34,7 +34,7 @@ function activate(context) {
         const affectedConfiguration = settings.changedConfiguration(event);
 
         if (affectedConfiguration == "plugin") {
-            if (settings.fetch('plugin', 'outputEnabled')) {
+            if (settings.fetch('plugin', 'enabled')) {
                 server.startServer(settings.fetch('plugin', 'port'));
             } else {
                 server.stopServer();
