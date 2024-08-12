@@ -3,15 +3,14 @@ Displays Roblox Studio output to an output channel in Visual Studio Code, with a
  
  Useful for certain Rojo projects where you want to quickly open scripts that error without having to navigate through your folders and file structures.
 
+ ![VSCode output view](https://raw.githubusercontent.com/v-champion/nexus-sync/main/images/screenshots/1.png)
+
 ## Features
 * Colorised output messages, formatted based on message type 
 
 * Connects automatically or manually via plugin settings
 
 * Rojo support: clickable stack trace file sources
-
-
-![VSCode output view](https://raw.githubusercontent.com/v-champion/nexus-sync/8bfc06dd0802f575194d722f01bc03a378ee363c/images/screenshots/1.png)
 
 ## Installation
 
@@ -30,12 +29,22 @@ If you want Nexus Sync to start automatically, right click the extension and sel
 
 ### Missing output messages
 
-If you are missing output messages, set the "Roblox Studio" output channel log level to "Trace".
+If you are missing any output messages, set the "Roblox Studio" output channel log level to "Trace", then set it as default like shown below:
+
+![How to set output log level](https://raw.githubusercontent.com/v-champion/nexus-sync/main/images/screenshots/2.gif)
 
 ## Limitations
 
 ### If you are using Rojo
 For Rojo users, this extension relies on your Rojo sourcemap file(s) to locate scripts that error, so if it does not exist, your output  will not contain clickable output text for script errors.
 
-### Output flooding
+### Output Flooding
 If the studio output is flooded with prints/errors etc in a very short period of time (i.e. RunService events) the plugin may throttle the messages sent because of HttpService constraints
+
+### Singular Channel
+
+Currently there is only one `Roblox Studio` channel that all the output messages will be logged to. You can still however log multiple studio places.
+
+### Play Tests
+
+As of this time there are no detections in place to clear the output whenever a test session is launched.
