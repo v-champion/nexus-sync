@@ -25,11 +25,11 @@ function activate(context) {
     });
 
     let startServer = vscode.commands.registerCommand('nexus-sync.startServer', () => {
-        server.startServer(settings.fetch('plugin', 'port'));
+        server.start(settings.fetch("plugin", "port"));
     });
 
     let stopServer = vscode.commands.registerCommand('nexus-sync.stopServer', () => {
-        server.stopServer();
+        server.stop();
     });
 
     const linkProvider = vscode.languages.registerDocumentLinkProvider({ scheme: 'output' }, {
@@ -41,12 +41,12 @@ function activate(context) {
     context.subscriptions.push(openFile, linkProvider, startServer, stopServer);
 
     if (settings.fetch('server', 'autoStart')) {
-        server.startServer(settings.fetch('plugin', 'port'));
+        server.start(settings.fetch('plugin', 'port'));
     }
 }
 
 function deactivate() {
-    server.stopServer();
+    server.stop();
 }
 
 module.exports = {

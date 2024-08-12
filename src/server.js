@@ -6,8 +6,6 @@ const contentType = {"Content-Type": "application/json"};
 
 let mostRecentLogIndex = 0;
 let stackTrace = false;
-
-let debugRequestsReceived = 0;
 let server;
 
 function parseOutputLogs(body) {
@@ -17,8 +15,12 @@ function parseOutputLogs(body) {
         mostRecentLogIndex = 0;
         stackTrace = false;
     }
-    
-    const sortedLogs = Object.entries(Logs).sort((a, b) => Number(a[0]) - Number(b[0]));
+
+    return {logs: Logs, placeId: PlaceId, startTime: StartTime};
+}
+
+function sortOutputLogs(data) {
+    const sortedLogs = Object.entries(data.logs).sort((a, b) => Number(a[0]) - Number(b[0]));
     
     sortedLogs.forEach(([key, log]) => {
         const logNumber = Number(key);
@@ -26,7 +28,7 @@ function parseOutputLogs(body) {
         if (logNumber > mostRecentLogIndex && log !== null) {
             mostRecentLogIndex = logNumber;
             
-            if (log.timestamp >= StartTime) {
+            if (log.timestamp >= data.startTime) {
                 if (log.message === "Stack Begin") {
                     stackTrace = true;
                 }
@@ -40,7 +42,7 @@ function parseOutputLogs(body) {
                     log.messageType = "MessageTrace";
                 }
     
-                output.logToOutput(PlaceId, log.message, log.messageType);
+                output.logToOutput(data.placeId, log.message, log.messageType);
     
                 if (log.message === "Stack End") {
                     stackTrace = false;
@@ -48,14 +50,11 @@ function parseOutputLogs(body) {
             }
         }
     });
-
-    debugRequestsReceived += 1;
-    console.log(debugRequestsReceived + " requests received!");
 }
 
 function handleRequest(body, res) {
     try {
-        parseOutputLogs(body);
+        sortOutputLogs(parseOutputLogs(body));
 
         res.writeHead(200, contentType);
         res.end(JSON.stringify({message: "Data received successfully"}));
@@ -67,7 +66,7 @@ function handleRequest(body, res) {
     }
 }
 
-function startServer(port) {
+function start(port) {
     if (!isServerRunning()) {
         output.start();
 
@@ -97,7 +96,7 @@ function startServer(port) {
     }
 }
 
-function stopServer() {
+function stop() {
     if (server) {
         server.close(() => {
             notification.send(`Nexus Sync plugin server stopped`);
@@ -111,7 +110,4 @@ function isServerRunning() {
     return server && server.listening;
 }
 
-module.exports = {
-    startServer,
-    stopServer,
-};
+module.exports = {start, stop};
