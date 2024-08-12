@@ -8,7 +8,7 @@ const output = require('./output');
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-	console.log('Nexus Sync: extension is running');
+	console.log('Nexus Sync: Extension activated');
 	
 	let openFile = vscode.commands.registerCommand('nexus-sync.openFile', (filePath, line) => {
         const uri = vscode.Uri.file(filePath);
@@ -38,16 +38,6 @@ function activate(context) {
         }
     });
 
-    // const settingChanged = vscode.workspace.onDidChangeConfiguration(event => {
-    //     const affectedConfiguration = settings.changedConfiguration(event);
-
-    //     if (affectedConfiguration == "server") {
-    //         if (settings.fetch('server', 'autoStart')) {
-    //             server.startServer(settings.fetch('plugin', 'port'));
-    //         }
-    //     }
-    // });
-
     context.subscriptions.push(openFile, linkProvider, startServer, stopServer);
 
     if (settings.fetch('server', 'autoStart')) {
@@ -63,3 +53,13 @@ module.exports = {
 	activate,
 	deactivate
 }
+
+ // const settingChanged = vscode.workspace.onDidChangeConfiguration(event => {
+    //     const affectedConfiguration = settings.changedConfiguration(event);
+
+    //     if (affectedConfiguration == "server") {
+    //         if (settings.fetch('server', 'autoStart')) {
+    //             server.startServer(settings.fetch('plugin', 'port'));
+    //         }
+    //     }
+    // });

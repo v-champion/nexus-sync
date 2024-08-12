@@ -13,43 +13,53 @@ function getScriptNameAndLocationArray(scriptLocation) {
     return [scriptName, location];
 }
 
+function getRojoProjects() {
+    const workspaceFolders = vscode.workspace.workspaceFolders || [];
+    const rojoProjects = [];
+
+    for (const folder of workspaceFolders) {
+        try {
+            const projectPath = path.join(folder.uri.fsPath, 'default.project.json');
+            const sourcemapPath = path.join(folder.uri.fsPath, 'sourcemap.json');
+    
+            if (fs.existsSync(sourcemapPath) && fs.existsSync(projectPath)) {
+                rojoProjects.push({
+                    sourcemap: JSON.parse(fs.readFileSync(sourcemapPath, 'utf8')),
+                    project: JSON.parse(fs.readFileSync(projectPath, 'utf8')),
+                    folder: folder
+                });
+            }
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
+
+    return rojoProjects;
+}
+
 function getScriptFilePath(placeId, message, type) {
     const scriptLocation = parse.extractScriptLocation(message, type, true);
 
-    if (scriptLocation) {
-        const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!scriptLocation) {
+        return null;
+    }
+    
+    const rojoProjects = getRojoProjects();
 
-        if (workspaceFolders) {
-            for (const folder of workspaceFolders) {
-                const sourcemapPath = path.join(folder.uri.fsPath, 'sourcemap.json');
-                const projectPath = path.join(folder.uri.fsPath, 'default.project.json');
+    for (const rojo of rojoProjects) {
+        const servePlaceIds = rojo.project.servePlaceIds;
 
-                // Check if the file exists
-                if (fs.existsSync(sourcemapPath) && fs.existsSync(projectPath)) {		
-                    const projectContent = fs.readFileSync(projectPath, 'utf8');	
-                    const projectJson = JSON.parse(projectContent);
-
-                    if (projectJson.servePlaceIds) {
-                        const servePlaceId = projectJson.servePlaceIds.includes(placeId);
-
-                        if (!servePlaceId) {
-                            continue;
-                        }
-                    }
-
-                    const sourcemapContent = fs.readFileSync(sourcemapPath, 'utf8');
-                    const sourcemapJson = JSON.parse(sourcemapContent);
-                    
-                    const [name, location] = getScriptNameAndLocationArray(scriptLocation);
-                    
-                    const filePath = searchForScriptInSourcemap(sourcemapJson, name, location, path.join("..", folder.name));
-
-                    if (filePath) {
-                        return filePath;
-                    }
-                }
-            }
+        if (servePlaceIds && !servePlaceIds.includes(placeId)) {
+            continue;
         }
+
+        const [name, location] = getScriptNameAndLocationArray(scriptLocation);
+
+        return searchForScriptInSourcemap(
+            rojo.sourcemap, name, location, 
+            path.join("..", rojo.folder.name)
+        );
     }
 	return null;
 }

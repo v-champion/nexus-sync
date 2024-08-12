@@ -4,6 +4,7 @@ local Settings = require(script.Parent.Settings)
 local Ratelimit = require(script.Ratelimit)
 
 local CooldownCheck = Ratelimit(6, 3)
+local CooldownDelay = 1
 
 local Http = {}
 
@@ -22,16 +23,17 @@ function Http:Post(Data)
 			if response.Success then
 				return response
 			end
-            return false
+            return response
 		end)
         
 		if Success and Result and Result.Success then
 			return true
 		else
-			warn("[Nexus Sync]: " .. Result)
+			warn("[Nexus Sync]:", Result)
 		end
 	else
-		task.wait(1)
+		task.wait(CooldownDelay)
+		return "Ratelimited"
 	end
     return false
 end

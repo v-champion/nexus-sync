@@ -2,30 +2,30 @@ const notification = require('./notification');
 const output = require('./output');
 const http = require('http');
 
-const contentType = {'Content-Type': 'application/json'};
+const contentType = {"Content-Type": "application/json"};
 
 let mostRecentLogIndex = 0;
 let stackTrace = false;
 
+let debugRequestsReceived = 0;
 let server;
 
 function parseOutputLogs(body) {
     const {StartTime, Cleared, PlaceId, Logs} = JSON.parse(body);
-    //console.log(StartTime);
 
     if (Cleared) {
-        //console.log("Cleared logs");
         mostRecentLogIndex = 0;
+        stackTrace = false;
     }
-
+    
     const sortedLogs = Object.entries(Logs).sort((a, b) => Number(a[0]) - Number(b[0]));
     
     sortedLogs.forEach(([key, log]) => {
         const logNumber = Number(key);
 
-        if (logNumber > mostRecentLogIndex) {
+        if (logNumber > mostRecentLogIndex && log !== null) {
             mostRecentLogIndex = logNumber;
-
+            
             if (log.timestamp >= StartTime) {
                 if (log.message === "Stack Begin") {
                     stackTrace = true;
@@ -48,7 +48,23 @@ function parseOutputLogs(body) {
             }
         }
     });
-    //output.logToOutput(PlaceId, Message, Type);
+
+    debugRequestsReceived += 1;
+    console.log(debugRequestsReceived + " requests received!");
+}
+
+function handleRequest(body, res) {
+    try {
+        parseOutputLogs(body);
+
+        res.writeHead(200, contentType);
+        res.end(JSON.stringify({message: "Data received successfully"}));
+    } catch (err) {
+        console.log(err);
+        console.log(body);
+        res.writeHead(400, contentType);
+        res.end(JSON.stringify({error: "Error parsing JSON data"}));
+    }
 }
 
 function startServer(port) {
@@ -56,30 +72,19 @@ function startServer(port) {
         output.start();
 
         server = http.createServer((req, res) => {
-            if (req.method === 'POST' && req.url === '/data') {
-                let body = '';
+            if (req.method === "POST" && req.url === "/data") {
+                let body = "";
 
-                req.on('data', (chunk) => {
-                body += chunk.toString();
+                req.on("data", (chunk) => {
+                    body += chunk.toString();
                 });
 
-                req.on('end', () => {
-                    try {
-                        parseOutputLogs(body);
-
-                        res.writeHead(200, contentType);
-                        res.end(JSON.stringify({message: 'Data received successfully'}));
-
-                    } catch (err) {
-                        console.log(err);
-
-                        res.writeHead(400, contentType);
-                        res.end(JSON.stringify({error: 'Invalid JSON data'}));
-                    }
+                req.on("end", () => {
+                    handleRequest(body, res);
                 });
             } else {
                 res.writeHead(404, contentType);
-                res.end(JSON.stringify({error: 'Endpoint not found'}));
+                res.end(JSON.stringify({error: "Endpoint not found"}));
             }
         });
         
@@ -103,7 +108,7 @@ function stopServer() {
 }
 
 function isServerRunning() {
-    return server && server.listening; // Check if the server is defined and listening
+    return server && server.listening;
 }
 
 module.exports = {

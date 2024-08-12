@@ -8,7 +8,6 @@ local Server = {
 	["Changed"] = Signal.new();
 	["Disconnected"] = false;
 	["Connecting"] = false;
-	["Ready"] = false;
 }
 
 function Server:Connect(Yield: boolean | nil)
@@ -19,10 +18,12 @@ function Server:Connect(Yield: boolean | nil)
 		Server.Changed:Fire(false)
 		
 		Cleanup:Hook().PingCheck = task.spawn(function()
-			local Timeout = 5
+			local Timeout = 3
 			
-			while task.wait(1) and Timeout > 0 and not Server.Connected do
+			while Timeout > 0 and not Server.Connected do
 				Server.Connected = Http:Ping()
+
+				task.wait(1)
 				Timeout -= 1
 			end
 			
@@ -39,7 +40,7 @@ function Server:Connect(Yield: boolean | nil)
 end
 
 function Server:Update()
-	Server.LastUpdate = os.time()
+	Server.LastUpdate = os.clock()
 	
 	if Server.Connected and not Server.Connecting then
 		if Http:Ping() then
@@ -51,7 +52,7 @@ function Server:Update()
 end
 
 function Server:UpdateStartTime()
-	Server.StartTime = os.time() - 0.1
+	Server.StartTime = os.clock() - 0.1
 end
 
 function Server:Disconnect()

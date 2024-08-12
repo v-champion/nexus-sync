@@ -5,68 +5,87 @@ local Cleanup = require(script.Parent.Cleanup)
 local Server = require(script.Parent.Server)
 local Http = require(script.Parent.Http)
 
-local plugin = plugin or script:FindFirstAncestorWhichIsA("Plugin")
+local Output = {
+	["UploadInterval"] = 1/15;
+	["PendingLogs"] = false;
+	["Busy"] = false;
+	["Logs"] = {
+		["Uploaded"] = 0;
+		["Count"] = 0;
+		["Data"] = {};
+	};
+}
 
-local Output = {}
-Output.LogCount = 0
-Output.Busy = false
+function Output:Upload(Logs, Count, Clear)
+	Server.LastUpdate = os.clock()
 
-function Output:Sanitize()
-	local LogHistory, Logs = LogService:GetLogHistory(), {}
-	
-	local Cleared = false
-	
-	if #LogHistory > Output.LogCount then
-		if Output.LogCount == 0 then
-			Cleared = true
-		end
-		Output.LogCount = #LogHistory
+	local Data = {
+		["StartTime"] = Server.StartTime;
+		["PlaceId"] = game.PlaceId;
+		["Cleared"] = Clear;
+		["Logs"] = Logs
+	}
+
+	local HttpRequest = Http:Post(Data)
+
+	if HttpRequest == "Ratelimited" then
+		task.wait(Output.UploadInterval)
+		Output:Upload(Logs, Count, Clear)
 		
-	elseif math.abs(Output.LogCount - #LogHistory) > 1 then
-		Output.LogCount = #LogHistory
-		Cleared = true
+	elseif not HttpRequest then
+		Server:Connect(true)
+	else
+		Output.Logs.Uploaded = Count
 	end
-	
-	for i = math.max(#LogHistory - 25, 1), #LogHistory do
-		local Log = LogHistory[i]
-		
-		if Log then
-			Log.messageType = Log.messageType.Name
-			Logs[i] = Log	
-		end
-	end
-	
-	return Logs, Cleared
 end
 
-function Output:Flush()	
-	local Logs, Cleared = Output:Sanitize()
+function Output:Collect(Count)
+	local NewSession = false
+	local Logs = {}
+
+	for i = Output.Logs.Uploaded, Count do
+		if i == 0 then
+			NewSession = true
+			continue
+		end
+		Logs[tostring(i)] = Output.Logs.Data[i]
+		Output.Logs.Data[i] = nil
+	end
 	
-	if not Output.Busy or Server.Ready then
+	return Logs, NewSession
+end
+
+function Output:Flush(Count)	
+	if not Output.Busy then
 		Output.Busy = true
 
-		Server.Ready = false
-		Server.LastUpdate = os.time()
-		
-		local Data = {
-			["StartTime"] = Server.StartTime;
-			["PlaceId"] = game.PlaceId;
-			["Cleared"] = Cleared;
-			["Logs"] = Logs
-		}
+		local Logs, Clear = Output:Collect(Count)
 
-		if not Http:Post(Data) then
-			Server:Connect(true)
+		if Logs then
+			Output:Upload(Logs, Count, Clear)
 		end
-		
-		Output.Busy = false
-	else
-		task.delay(1/15, function()
-			if not Output.Busy then
-				Output:Flush()
-			end
-		end)
+
+		Output.Busy = false	
 	end
+end
+
+function Output:IsConnected()
+	if Server.Disconnected then
+		return
+	end
+	
+	if not Server.Connected then
+		if not Server.Connecting and Settings.autoConnect then
+			Server:Connect()
+		end
+		return
+	end
+
+	if not Server.StartTime then
+		Server:UpdateStartTime()
+	end
+
+	return true
 end
 
 function Output:Load()
@@ -74,23 +93,27 @@ function Output:Load()
 		Server:Connect()
 	end
 	
-	Cleanup:Hook().MessageOut = LogService.MessageOut:Connect(function(Message, Type)
-		if Message:find(plugin.Name) or Server.Disconnected then
-			return
-		end
-				
-		if not Server.Connected then
-			if not Server.Connecting and Settings.autoConnect then
-				Server:Connect()
+	Cleanup:Hook().OutputQueue = task.spawn(function()
+		while task.wait(Output.UploadInterval) do
+			if Output.PendingLogs and Output:IsConnected() then
+				Output.PendingLogs = false
+				Output:Flush(Output.Logs.Count)	
 			end
-			return
 		end
-		
-		if not Server.StartTime then
-			Server:UpdateStartTime()
+	end)
+
+	Cleanup:Hook().MessageOut = LogService.MessageOut:Connect(function(Message, Type)
+		Output.Logs.Count += 1
+
+		Output.Logs.Data[Output.Logs.Count] = {
+			["message"] = Message;
+			["timestamp"] = os.clock();
+			["messageType"] = Type.Name;
+		}
+
+		if not Output.PendingLogs and Output:IsConnected() then
+			Output.PendingLogs = true
 		end
-		
-		task.delay(1/15, Output.Flush)
 	end)
 end
 
