@@ -10,18 +10,8 @@ const output = require('./output');
 function activate(context) {
 	console.log('Nexus Sync: Extension activated');
 	
-	let openFile = vscode.commands.registerCommand('nexus-sync.openFile', (filePath, line) => {
-        const uri = vscode.Uri.file(filePath);
-
-        vscode.workspace.openTextDocument(uri).then(doc => {
-            vscode.window.showTextDocument(doc).then(editor => {
-                const position = new vscode.Position(line - 1, 0);
-                const range = new vscode.Range(position, position);
-
-                editor.selection = new vscode.Selection(position, position);
-                editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
-            });
-        });
+	let openFileEvent = vscode.commands.registerCommand('nexus-sync.openFile', (filePath, line) => {
+        openFile(filePath, line);
     });
 
     let startServer = vscode.commands.registerCommand('nexus-sync.startServer', () => {
@@ -37,12 +27,26 @@ function activate(context) {
             return output.documentLinks(document);   
         }
     });
-
-    context.subscriptions.push(openFile, linkProvider, startServer, stopServer);
+    
+    context.subscriptions.push(openFileEvent, linkProvider, startServer, stopServer);
 
     if (settings.fetch('server', 'autoStart')) {
         server.start(settings.fetch('plugin', 'port'));
     }
+}
+
+function openFile(filePath, line) {
+    const uri = vscode.Uri.file(filePath);
+
+    vscode.workspace.openTextDocument(uri).then(doc => {
+        vscode.window.showTextDocument(doc).then(editor => {
+            const position = new vscode.Position(line - 1, 0);
+            const range = new vscode.Range(position, position);
+
+            editor.selection = new vscode.Selection(position, position);
+            editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
+        });
+    });
 }
 
 function deactivate() {
