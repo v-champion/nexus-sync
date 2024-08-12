@@ -25,8 +25,6 @@ async function documentLinks(document) {
     const text = document.getText();
     const links = [];
 
-    let startIndex = 0;
-
     const sortedEntries = Array.from(scriptLocationMap.entries()).sort((a, b) => 
         parse.extractScriptLocation(b[0], b[1].messageType).length - parse.extractScriptLocation(a[0], a[1].messageType).length
     );
@@ -37,6 +35,8 @@ async function documentLinks(document) {
         if (!scriptLocation) {
             continue;
         }
+
+        let startIndex = 0;
         
         while (startIndex !== -1) {
             startIndex = text.indexOf(message, startIndex);
