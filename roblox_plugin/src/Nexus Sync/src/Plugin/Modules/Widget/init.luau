@@ -1,5 +1,5 @@
 local plugin = plugin or script:FindFirstAncestorWhichIsA("Plugin")
-local toolbar = plugin:CreateToolbar("Nexus Sync")
+local toolbar = plugin:CreateToolbar("Nexus Toolset")
 
 local Settings = require(script.Parent.Settings)
 local Server = require(script.Parent.Server)
