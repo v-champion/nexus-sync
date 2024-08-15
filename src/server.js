@@ -57,6 +57,16 @@ function handleRequest(body, res) {
     }
 }
 
+function handleConnectError(error, port) {
+    if (error.message.includes("EADDRINUSE")) {
+        notification.send(`Port ${port} is already in use`);
+        console.log(`Nexus Sync: Port ${port} is already in use`);
+    } else {
+        notification.send(`Error starting server: ${error.message}`);
+        console.log(`Nexus Sync: Error starting server: ${error.message}`);
+    }
+}
+
 function start(port) {
     if (!isServerRunning()) {
         output.start();
@@ -77,6 +87,10 @@ function start(port) {
                 res.end(JSON.stringify({error: "Endpoint not found"}));
             }
         });
+
+        server.on('error', (error) => {
+            handleConnectError(error, port);
+        });
         
         server.listen(port, () => {
             notification.send(`Nexus Sync plugin server running on port ${port}`);
@@ -88,17 +102,28 @@ function start(port) {
 }
 
 function stop() {
-    if (server) {
+    if (isServerRunning()) {
         server.close(() => {
             notification.send(`Nexus Sync plugin server stopped`);
             console.log('Nexus Sync: Server stopped');
         });
+
+        output.stop();
+        
+    } else {
+        notification.send(`Nexus Sync plugin server already stopped`);
+        
+        if (server) {
+            server.close();
+        }
     }
-    output.stop();
 }
 
 function isServerRunning() {
-    return server && server.listening;
+    if (server) {
+        return server.listening;
+    }
+    return false;
 }
 
 module.exports = {start, stop};
