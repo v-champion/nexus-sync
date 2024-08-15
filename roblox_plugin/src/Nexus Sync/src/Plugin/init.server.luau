@@ -4,6 +4,7 @@ local Settings = require(script.Modules.Settings)
 local Cleanup = require(script.Modules.Cleanup)
 local Widget = require(script.Modules.Widget)
 local Output = require(script.Modules.Output)
+local Server = require(script.Modules.Server)
 
 Settings:Load()
 Widget:Load()
@@ -16,7 +17,7 @@ end
 
 Cleanup:Hook().Ping = task.spawn(function()
 	while task.wait(1) do
-		Widget:Update()
+		Server:Update()
 	end
 end)
 

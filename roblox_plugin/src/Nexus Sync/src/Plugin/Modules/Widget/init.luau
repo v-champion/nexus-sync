@@ -73,7 +73,7 @@ local function Connect()
 	if not Server.Connected and not Server.Connecting then
 		UpdateConnectButton(false, "Connect")
 		UpdateStatus("Connecting")
-		Server:Connect(true)		
+		Server:Connect(true, true)		
 	end
 end
 
@@ -81,14 +81,6 @@ local function Disconnect()
 	if Server.Connected then
 		UpdateConnectButton(false, "Disconnect")
 		Server:Disconnect()
-	end
-end
-
-function Widget:Update()
-	if Server.Connected then
-		if (os.time() - Server.LastUpdate) >= 5 then
-			Server:Update()
-		end
 	end
 end
 
@@ -117,20 +109,28 @@ function Widget:Load()
 			SettingFrame.Text.Box.Text = Settings.port
 			
 			SettingFrame.Text.Box.FocusLost:Connect(function()
-				if not tonumber(SettingFrame.Text.Box) then
-					SettingFrame.Text.Box.Text = Settings.port
-				else
+				local Port = tonumber(SettingFrame.Text.Box.Text)
+
+				if Port then
+					Settings.port = Port
 					Settings:Save()
+				else
+					SettingFrame.Text.Box.Text = Settings.port
 				end
 			end)
 		end
 	end
 	
 	Frame.Connect.MouseButton1Click:Connect(function()
-		if Server.Connected then
-			Disconnect()
-		else
-			Connect()
+		if Frame.Connect.Active then
+			Frame.Connect.Active = false
+
+			if Server.Connected then
+				Disconnect()
+			else
+				Connect()
+			end
+			Frame.Connect.Active = true
 		end
 	end)
 	

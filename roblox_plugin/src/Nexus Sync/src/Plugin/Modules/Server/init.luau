@@ -1,16 +1,22 @@
+local Settings = require(script.Parent.Settings)
 local Cleanup = require(script.Parent.Cleanup)
 local Http = require(script.Parent.Http)
 
 local Signal = require(script.Signal)
 
 local Server = {
-	["LastUpdate"] = os.time();
-	["Changed"] = Signal.new();
-	["Disconnected"] = false;
-	["Connecting"] = false;
+	Changed = Signal.new();
+	Disconnected = false;
+	Connecting = false;
+	Connected = false;
+	StartTime = nil;
 }
 
-function Server:Connect(Yield: boolean | nil)
+function Server:Connect(Yield: boolean | nil, Force: boolean | nil)
+	if Server.Disconnected and not Force then
+		return
+	end
+
 	if not Server.Connecting then
 		Server.Connecting = true
 		Server.Connected = false
@@ -26,7 +32,7 @@ function Server:Connect(Yield: boolean | nil)
 				task.wait(1)
 				Timeout -= 1
 			end
-			
+
 			Server.Disconnected = false
 			Server.Connecting = false
 			
@@ -37,30 +43,38 @@ function Server:Connect(Yield: boolean | nil)
 	if Yield and Server.Connecting then
 		Server.Changed:Wait()
 	end
+	
+	return Server.Connected
 end
 
-function Server:Update()
-	Server.LastUpdate = os.clock()
-	
+function Server:Update()	
 	if Server.Connected and not Server.Connecting then
 		if Http:Ping() then
 			return
 		end
-		Server.Connected = false
-		Server.Changed:Fire(false)
+		Server:Disconnect(true)
 	end
 end
 
-function Server:UpdateStartTime()
-	Server.StartTime = os.clock() - 0.1
+function Server:Disconnect(LostConnection: boolean | nil)
+	Server.Disconnected = not LostConnection		
+	Server.Connected = false
+	Server.StartTime = nil
+	task.wait(1)
+	Server.Changed:Fire(Server.Connected)
 end
 
-function Server:Disconnect()
-	Server.Disconnected = true		
-	Server.Connected = false
-	Server.StartTime = false
-	task.wait(1)
-	Server.Changed:Fire(false)
+function Server:AutoConnect(...)
+	if Settings.autoConnect then
+		return Server:Connect(...)	
+	end
+	return
+end
+
+function Server:UpdateStartTime()
+	if not Server.StartTime then
+		Server.StartTime = DateTime.now().UnixTimestampMillis - 2000
+	end
 end
 
 return Server

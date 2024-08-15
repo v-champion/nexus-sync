@@ -67,14 +67,13 @@ async function logMessageToFilepath(message, type, filePath) {
     });
 }
 
-async function logToOutput(placeId, message, type) {
+function logToOutput(placeId, message, type) {
     if (type === "MessageError" || type === "MessageTrace") {
         const filePath = sourcemap.getScriptFilePath(placeId, message, type);
 
         if (filePath) {
             logMessageToFilepath(message, type, filePath);
         }
-
         handleErrorOrTrace(message, type);
     } else {
         handleOtherTypes(message, type);

@@ -57,13 +57,3 @@ module.exports = {
 	activate,
 	deactivate
 }
-
- // const settingChanged = vscode.workspace.onDidChangeConfiguration(event => {
-    //     const affectedConfiguration = settings.changedConfiguration(event);
-
-    //     if (affectedConfiguration == "server") {
-    //         if (settings.fetch('server', 'autoStart')) {
-    //             server.startServer(settings.fetch('plugin', 'port'));
-    //         }
-    //     }
-    // });

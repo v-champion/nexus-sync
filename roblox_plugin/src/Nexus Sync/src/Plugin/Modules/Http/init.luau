@@ -53,4 +53,8 @@ function Http:Ping()
     return false
 end
 
+function Http:GUID()
+	return HttpService:GenerateGUID(false)
+end
+
 return Http
