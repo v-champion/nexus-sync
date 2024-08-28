@@ -1,3 +1,10 @@
+
+local RunService = game:GetService("RunService")
+
+if RunService:IsRunMode() then
+	return
+end
+
 plugin.Name = script.Parent.Name
 
 local Settings = require(script.Modules.Settings)

@@ -67,7 +67,23 @@ async function logMessageToFilepath(message, type, filePath) {
     });
 }
 
+function sanitizeInstanceTable(message) {
+    // Find all contents starting with "{<string> =" and ending with "... }" not followed by a comma
+    const regex = /\{\w+\s*=.*?\.\.\.\ \}(?!,)\s*/gs;
+    
+    return message.replace(regex, match => {
+        if (match.includes(", Archivable = ")) {
+            return "";
+        }
+        return match;
+    }).trim();
+}
+
 function logToOutput(placeId, message, type) {
+    if (message.includes(", Archivable = ")) {
+        message = sanitizeInstanceTable(message);
+    }
+
     if (type === "MessageError" || type === "MessageTrace") {
         const filePath = sourcemap.getScriptFilePath(placeId, message, type);
 

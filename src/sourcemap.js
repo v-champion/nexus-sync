@@ -2,7 +2,10 @@ const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
 
+const settings = require('./settings');
 const parse = require('./parse');
+
+const projectFileName = settings.fetch("workspace", "projectFile");
 
 function getScriptDetails(message, type) {    
     const scriptLocation = parse.extractScriptLocation(message, type, true);
@@ -25,9 +28,9 @@ function getRojoProjects() {
 
     for (const folder of workspaceFolders) {
         try {
-            const projectPath = path.join(folder.uri.fsPath, 'default.project.json');
+            const projectPath = path.join(folder.uri.fsPath, projectFileName);
             const sourcemapPath = path.join(folder.uri.fsPath, 'sourcemap.json');
-    
+            
             if (fs.existsSync(sourcemapPath) && fs.existsSync(projectPath)) {                
                 rojoProjects.push({
                     sourcemap: JSON.parse(fs.readFileSync(sourcemapPath, 'utf8')),
@@ -54,7 +57,7 @@ function getScriptFilePath(placeId, message, type) {
     const rojoProjects = getRojoProjects();
 
     for (const rojo of rojoProjects) {
-        const servePlaceIds = rojo.project.servePlaceIds;
+        const servePlaceIds = (rojo.project.servePlaceIds || rojo.project.placeIds);
         const folder = path.join("..", rojo.folder.name);
 
         const filePath = searchSourcemapForScript(rojo.sourcemap, scriptDetails, folder);

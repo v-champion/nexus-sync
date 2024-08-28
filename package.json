@@ -16,7 +16,7 @@
   },
   "license": "MIT",
   "icon": "icon.png",
-  "version": "0.3.0",
+  "version": "0.3.5",
   "engines": {
     "vscode": "^1.91.0"
   },
@@ -54,6 +54,12 @@
           "type": "boolean",
           "default": false,
           "description": "Automatically starts the server on startup",
+          "scope": "window"
+        },
+        "nexus-sync.workspace.projectFile": {
+          "type": "string",
+          "default": "default.project.json",
+          "description": "The name of the Rojo/Argon project file to use",
           "scope": "window"
         }
       }

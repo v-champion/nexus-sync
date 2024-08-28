@@ -2,6 +2,13 @@
 
 All notable changes to the "nexus-toolset" extension will be documented in this file.
 
+## `0.3.5` - August 28th, 2024
+
+- Fixed duplicated output messages by disabling the plugin in Test Play.
+- Improved output messages when an Instance is passed in the output
+- Added project json file name setting for the extension
+- Argon is now supported for multi place projects
+
 ## `0.3.0` - August 15th, 2024
 
 - Fixed not being able to adjust port number in plugin settings
