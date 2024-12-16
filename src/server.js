@@ -16,15 +16,15 @@ function parseOutputLogs(body) {
 
     return {
         startTime: StartTime,
-        placeId: PlaceId, 
+        placeId: PlaceId,
         GUID: GUID,
-        logs: Logs, 
+        logs: Logs,
     };
 }
 
 function sortOutputLogs(data) {
     const sortedLogs = Object.entries(data.logs).sort((a, b) => Number(a[0]) - Number(b[0]));
-    
+
     sortedLogs.forEach(([key, log]) => {
         const logNumber = Number(key);
 
@@ -36,7 +36,7 @@ function sortOutputLogs(data) {
                     log.message = log.message.replace("TestService: ", "");
                     log.messageType = "MessageDebug";
                 }
-                
+
                 output.logToOutput(data.placeId, log.message, log.messageType);
             }
         }
@@ -91,7 +91,7 @@ function start(port) {
         server.on('error', (error) => {
             handleConnectError(error, port);
         });
-        
+
         server.listen(port, () => {
             notification.send(`Nexus Sync plugin server running on port ${port}`);
             console.log(`Nexus Sync: Server running at http://localhost:${port}/`);
@@ -109,10 +109,10 @@ function stop() {
         });
 
         output.stop();
-        
+
     } else {
         notification.send(`Nexus Sync plugin server already stopped`);
-        
+
         if (server) {
             server.close();
         }

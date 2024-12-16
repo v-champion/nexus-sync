@@ -36,7 +36,11 @@
       {
         "command": "nexus-sync.stopServer",
         "title": "Nexus Sync: Stop Server"
-      }
+      },
+	  {
+		"command": "nexus-sync.clearSourcemapCache",
+		"title": "Nexus Sync: Clear Sourcemap Cache"
+	  }
     ],
     "menus": {
       "editor/context": []
