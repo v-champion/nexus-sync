@@ -8,9 +8,9 @@ const output = require('./output');
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-	console.log('Nexus Sync: Extension activated');
+    console.log('Nexus Sync: Extension activated');
 
-	let openFileEvent = vscode.commands.registerCommand('nexus-sync.openFile', (filePath, line) => {
+    let openFileEvent = vscode.commands.registerCommand('nexus-sync.openFile', (filePath, line) => {
         openFile(filePath, line);
     });
 
@@ -22,9 +22,9 @@ function activate(context) {
         server.stop();
     });
 
-	let clearSourcemapCache = vscode.commands.registerCommand('nexus-sync.clearSourcemapCache', () => {
-		output.clearSourcemapCache();
-	})
+    let clearSourcemapCache = vscode.commands.registerCommand('nexus-sync.clearSourcemapCache', () => {
+        output.clearSourcemapCache();
+    })
 
     const linkProvider = vscode.languages.registerDocumentLinkProvider({ scheme: 'output' }, {
         provideDocumentLinks(document) {
@@ -58,6 +58,6 @@ function deactivate() {
 }
 
 module.exports = {
-	activate,
-	deactivate
+    activate,
+    deactivate
 }

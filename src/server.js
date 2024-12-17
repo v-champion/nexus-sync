@@ -2,13 +2,13 @@ const notification = require('./notification');
 const output = require('./output');
 const http = require('http');
 
-const contentType = {"Content-Type": "application/json"};
+const contentType = { "Content-Type": "application/json" };
 
 let outputSessions = new Map();
 let server;
 
 function parseOutputLogs(body) {
-    const {StartTime, PlaceId, GUID, Logs} = JSON.parse(body);
+    const { StartTime, PlaceId, GUID, Logs } = JSON.parse(body);
 
     if (!outputSessions.has(GUID)) {
         outputSessions.set(GUID, 0);
@@ -48,12 +48,12 @@ function handleRequest(body, res) {
         sortOutputLogs(parseOutputLogs(body));
 
         res.writeHead(200, contentType);
-        res.end(JSON.stringify({message: "Data received successfully"}));
+        res.end(JSON.stringify({ message: "Data received successfully" }));
     } catch (err) {
         console.log(err);
         console.log(body);
         res.writeHead(400, contentType);
-        res.end(JSON.stringify({error: "Error parsing JSON data"}));
+        res.end(JSON.stringify({ error: "Error parsing JSON data" }));
     }
 }
 
@@ -84,7 +84,7 @@ function start(port) {
                 });
             } else {
                 res.writeHead(404, contentType);
-                res.end(JSON.stringify({error: "Endpoint not found"}));
+                res.end(JSON.stringify({ error: "Endpoint not found" }));
             }
         });
 
@@ -126,4 +126,4 @@ function isServerRunning() {
     return false;
 }
 
-module.exports = {start, stop};
+module.exports = { start, stop };

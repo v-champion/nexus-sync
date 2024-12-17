@@ -27,24 +27,24 @@ function parseScriptLocation(input) {
 function extractScriptLocationsAndLineNumbers(input) {
     const locations = [];
 
-	let match;
-	for (const regex of [ scriptRegexFromLog, scriptRegexFromTrace ]) {
-		while ((match = regex.exec(input)) !== null) {
-			const scriptPath = parseScriptLocation(`${match[1]}.${match[2]}`);
-			const lineNumber = parseInt(match[3], 10);
-			const startIndex = input.indexOf(scriptPath, match.index);
+    let match;
+    for (const regex of [scriptRegexFromLog, scriptRegexFromTrace]) {
+        while ((match = regex.exec(input)) !== null) {
+            const scriptPath = parseScriptLocation(`${match[1]}.${match[2]}`);
+            const lineNumber = parseInt(match[3], 10);
+            const startIndex = input.indexOf(scriptPath, match.index);
 
-			locations.push({
-				scriptPath,
-				lineNumber,
-				startIndex,
-			});
-		}
-	}
+            locations.push({
+                scriptPath,
+                lineNumber,
+                startIndex,
+            });
+        }
+    }
 
     return locations;
 }
 
 module.exports = {
-	extractScriptLocationsAndLineNumbers,
+    extractScriptLocationsAndLineNumbers,
 }

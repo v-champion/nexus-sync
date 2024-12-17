@@ -59,31 +59,31 @@ function searchSourcemapForScript(node, scriptDetails, folderName, parentNode) {
 }
 
 function getScriptFilePathSingular(placeId, scriptLocation) {
-	const rojoProjects = getRojoProjects();
+    const rojoProjects = getRojoProjects();
 
-	 for (const rojo of rojoProjects) {
-		 const servePlaceIds = (rojo.project.servePlaceIds || rojo.project.placeIds);
-		 const folder = path.join("..", rojo.folder.name);
+    for (const rojo of rojoProjects) {
+        const servePlaceIds = (rojo.project.servePlaceIds || rojo.project.placeIds);
+        const folder = path.join("..", rojo.folder.name);
 
-		 const parts = scriptLocation.split(".");
+        const parts = scriptLocation.split(".");
 
-		 let scriptName = parts.pop();
-		 let location = parts
+        let scriptName = parts.pop();
+        let location = parts
 
-		 const filePath = searchSourcemapForScript(rojo.sourcemap, [scriptName, location], folder);
+        const filePath = searchSourcemapForScript(rojo.sourcemap, [scriptName, location], folder);
 
-		 if (servePlaceIds) {
-			 if (servePlaceIds.includes(placeId)) {
-				 return filePath;
-			 }
-		 }
-		 else if (filePath) {
-			 return filePath;
-		 }
-	 }
-	 return null;
- }
+        if (servePlaceIds) {
+            if (servePlaceIds.includes(placeId)) {
+                return filePath;
+            }
+        }
+        else if (filePath) {
+            return filePath;
+        }
+    }
+    return null;
+}
 
 module.exports = {
-	getScriptFilePathSingular
+    getScriptFilePathSingular
 }
