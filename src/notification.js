@@ -15,5 +15,5 @@ function send(message) {
 }
 
 module.exports = {
-	send
+    send
 }

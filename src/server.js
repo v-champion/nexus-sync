@@ -2,13 +2,13 @@ const notification = require('./notification');
 const output = require('./output');
 const http = require('http');
 
-const contentType = {"Content-Type": "application/json"};
+const contentType = { "Content-Type": "application/json" };
 
 let outputSessions = new Map();
 let server;
 
 function parseOutputLogs(body) {
-    const {StartTime, PlaceId, GUID, Logs} = JSON.parse(body);
+    const { StartTime, PlaceId, GUID, Logs } = JSON.parse(body);
 
     if (!outputSessions.has(GUID)) {
         outputSessions.set(GUID, 0);
@@ -16,15 +16,15 @@ function parseOutputLogs(body) {
 
     return {
         startTime: StartTime,
-        placeId: PlaceId, 
+        placeId: PlaceId,
         GUID: GUID,
-        logs: Logs, 
+        logs: Logs,
     };
 }
 
 function sortOutputLogs(data) {
     const sortedLogs = Object.entries(data.logs).sort((a, b) => Number(a[0]) - Number(b[0]));
-    
+
     sortedLogs.forEach(([key, log]) => {
         const logNumber = Number(key);
 
@@ -36,7 +36,7 @@ function sortOutputLogs(data) {
                     log.message = log.message.replace("TestService: ", "");
                     log.messageType = "MessageDebug";
                 }
-                
+
                 output.logToOutput(data.placeId, log.message, log.messageType);
             }
         }
@@ -48,12 +48,12 @@ function handleRequest(body, res) {
         sortOutputLogs(parseOutputLogs(body));
 
         res.writeHead(200, contentType);
-        res.end(JSON.stringify({message: "Data received successfully"}));
+        res.end(JSON.stringify({ message: "Data received successfully" }));
     } catch (err) {
         console.log(err);
         console.log(body);
         res.writeHead(400, contentType);
-        res.end(JSON.stringify({error: "Error parsing JSON data"}));
+        res.end(JSON.stringify({ error: "Error parsing JSON data" }));
     }
 }
 
@@ -84,14 +84,14 @@ function start(port) {
                 });
             } else {
                 res.writeHead(404, contentType);
-                res.end(JSON.stringify({error: "Endpoint not found"}));
+                res.end(JSON.stringify({ error: "Endpoint not found" }));
             }
         });
 
         server.on('error', (error) => {
             handleConnectError(error, port);
         });
-        
+
         server.listen(port, () => {
             notification.send(`Nexus Sync plugin server running on port ${port}`);
             console.log(`Nexus Sync: Server running at http://localhost:${port}/`);
@@ -109,10 +109,10 @@ function stop() {
         });
 
         output.stop();
-        
+
     } else {
         notification.send(`Nexus Sync plugin server already stopped`);
-        
+
         if (server) {
             server.close();
         }
@@ -126,4 +126,4 @@ function isServerRunning() {
     return false;
 }
 
-module.exports = {start, stop};
+module.exports = { start, stop };

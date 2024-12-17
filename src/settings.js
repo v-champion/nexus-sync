@@ -7,7 +7,7 @@ function fetch(tag, name) {
 function changedConfiguration(event) {
     if (event.affectsConfiguration('nexus-sync.plugin')) {
         return "plugin";
-        
+
     } else if (event.affectsConfiguration('nexus-sync.workspace')) {
         return "workspace";
 
@@ -18,5 +18,5 @@ function changedConfiguration(event) {
 
 module.exports = {
     changedConfiguration,
-	fetch
+    fetch
 }

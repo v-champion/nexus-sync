@@ -1,24 +1,20 @@
-function scriptLocationFromTrace(string) {
-    const firstQuoteIndex = string.indexOf("'");
-    const lastQuoteIndex = string.lastIndexOf("'");
-    
-    if (firstQuoteIndex !== -1 && lastQuoteIndex !== -1 && firstQuoteIndex !== lastQuoteIndex) {
-        return string.substring(firstQuoteIndex + 1, lastQuoteIndex);
-    }
-    return null; 
-}
+const scriptServiceLocations = [
+    "Players",
+    "ReplicatedFirst",
+    "ReplicatedStorage",
+    "ServerScriptService",
+]
 
-function scriptLocationFromError(string) {
-    return string.split(':')[0];
-}
+const scriptRegexFromLog = new RegExp(`\\s?.*((${scriptServiceLocations.join("|")})\\.(.*?)(?::(\\d+):?))`, "g")
+const scriptRegexFromTrace = new RegExp(`(Script\\s+'(${scriptServiceLocations.join("|")})\\.(.*?)',?\\sLine\\s(\\d+))`, "g");
 
 function parseScriptLocation(input) {
     if (input.startsWith("Players")) {
         let transformed = input.replace("Players", "StarterPlayer");
         transformed = transformed.replace("PlayerScripts", "StarterPlayerScripts")
-        
+
         let parts = transformed.split(".");
-        
+
         if (parts.length > 1) {
             parts.splice(1, 1);
         }
@@ -27,42 +23,33 @@ function parseScriptLocation(input) {
     return input;
 }
 
-function extractScriptLocation(string, type, parse) {
-    let scriptLocation = null;
+function extractScriptLocationsAndLineNumbers(input) {
+    const locations = [];
 
-    if (type === "MessageTrace") {
-        scriptLocation = scriptLocationFromTrace(string);
-    } 
-    else {
-        scriptLocation = scriptLocationFromError(string);
-    }
-    if (scriptLocation && parse) {
-        return parseScriptLocation(scriptLocation);
-    }
-    return scriptLocation;
-}
+    let match;
+    for (const regex of [scriptRegexFromLog, scriptRegexFromTrace]) {
+        while ((match = regex.exec(input)) !== null) {
+            const message = match[1];
+            const startIndex = input.indexOf(match[1], match.index);
+            const scriptPath = parseScriptLocation(`${match[2]}.${match[3]}`);
+            const lineNumber = parseInt(match[4], 10);
 
-function extractScriptLineNumber(input, type) {
-    if (type === "MessageError" || input.includes("[error]")) {
-        const match = input.match(/.*:(\d+):/);
+            if (startIndex === -1) {
+                continue;
+            }
 
-        if (match) {
-            const number = match[1];
-            return number;
+            locations.push({
+                scriptPath,
+                lineNumber,
+                startIndex,
+                message,
+            });
         }
     }
-    else {
-        const regex = /Line (\d+)/;
-        const match = input.match(regex);
-        
-        if (match) {
-            return match[1];
-        }
-    }
-    return 1;
+
+    return locations;
 }
 
 module.exports = {
-    extractScriptLineNumber,
-    extractScriptLocation
+    extractScriptLocationsAndLineNumbers,
 }
