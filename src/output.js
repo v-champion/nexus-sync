@@ -46,7 +46,7 @@ async function documentLinks(document) {
         const linkData = {
             filePath: absoluteFilePath,
             lineNumber: location.lineNumber,
-            message: `${location.scriptPath}:${location.lineNumber}`,
+            message: location.message,
         }
 
         links.push(getLinkForOutput(location.startIndex, linkData, document))

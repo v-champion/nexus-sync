@@ -3,11 +3,10 @@ const scriptServiceLocations = [
     "ReplicatedFirst",
     "ReplicatedStorage",
     "ServerScriptService",
-    "StarterPlayer",
 ]
 
-const scriptRegexFromLog = new RegExp(`\\s?.*(${scriptServiceLocations.join("|")})\\.(.*?)(?::(\\d+):?)`, "g")
-const scriptRegexFromTrace = new RegExp(`Script\\s+'(${scriptServiceLocations.join("|")})\\.(.*?)',?\\sLine\\s(\\d+)`, "g");
+const scriptRegexFromLog = new RegExp(`\\s?.*((${scriptServiceLocations.join("|")})\\.(.*?)(?::(\\d+):?))`, "g")
+const scriptRegexFromTrace = new RegExp(`(Script\\s+'(${scriptServiceLocations.join("|")})\\.(.*?)',?\\sLine\\s(\\d+))`, "g");
 
 function parseScriptLocation(input) {
     if (input.startsWith("Players")) {
@@ -30,14 +29,20 @@ function extractScriptLocationsAndLineNumbers(input) {
     let match;
     for (const regex of [scriptRegexFromLog, scriptRegexFromTrace]) {
         while ((match = regex.exec(input)) !== null) {
-            const scriptPath = parseScriptLocation(`${match[1]}.${match[2]}`);
-            const lineNumber = parseInt(match[3], 10);
-            const startIndex = input.indexOf(scriptPath, match.index);
+            const message = match[1];
+            const startIndex = input.indexOf(match[1], match.index);
+            const scriptPath = parseScriptLocation(`${match[2]}.${match[3]}`);
+            const lineNumber = parseInt(match[4], 10);
+
+            if (startIndex === -1) {
+                continue;
+            }
 
             locations.push({
                 scriptPath,
                 lineNumber,
                 startIndex,
+                message,
             });
         }
     }
