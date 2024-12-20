@@ -4,7 +4,7 @@ function send(message) {
     vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: message,
-        cancellable: true
+        cancellable: false
     }, (progress) => {
         return new Promise((resolve) => {
             setTimeout(() => {
