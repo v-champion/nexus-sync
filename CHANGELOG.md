@@ -1,6 +1,11 @@
 # Change Log
 
-All notable changes to the "nexus-toolset" extension will be documented in this file.
+All notable changes to Nexus Sync will be documented in this file.
+
+## `0.4.0` - December 22nd, 2024
+
+- Fixed a bug where sometimes linked scripts that have identical names but different paths couldn't be differentiated
+- Improved the detection and linking of script traces 
 
 ## `0.3.5` - August 28th, 2024
 

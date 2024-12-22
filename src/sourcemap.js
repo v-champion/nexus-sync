@@ -31,31 +31,28 @@ function getRojoProjects() {
     return rojoProjects;
 }
 
-function searchSourcemapForScript(node, scriptDetails, folderName, parentNode) {
+function searchSourcemapForScript(sourcemap, scriptDetails, folderName) {
     const [name, location] = scriptDetails;
+    let node = sourcemap;
 
-    if (node.className.includes("Script") && node.filePaths) {
-        const luauFilePath = node.filePaths.find(filePath => filePath.includes('.lua'));
-
-        if (luauFilePath) {
-            const filePath = path.join(folderName, luauFilePath).replace(/\\/g, '/');
-            const parentName = parentNode.name || parentNode.className;
-
-            if (node.name === name && parentName === location[location.length - 1]) {
-                return filePath;
+    for (let i = 0; i < location.length; i++) {
+        for (const child of (node.children || [])) {
+            if (location[i] === (child.name || child.className)) {
+                node = child;
+                continue;
             }
         }
     }
 
-    if (node.children) {
-        for (const child of node.children) {
-            const result = searchSourcemapForScript(child, scriptDetails, folderName, node);
-            if (result) {
-                return result;
+    for (const child of (node.children || [])) {
+        if (child.className.includes("Script") && child.filePaths) {
+            const scriptPath = child.filePaths.find(filePath => filePath.includes('.lua'));
+
+            if (scriptPath && child.name === name) {
+                return path.join(folderName, scriptPath).replace(/\\/g, '/');
             }
         }
     }
-    return null;
 }
 
 function getScriptFilePathSingular(placeId, scriptLocation) {
