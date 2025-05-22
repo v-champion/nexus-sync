@@ -60,6 +60,12 @@
           "description": "Automatically starts the server on startup",
           "scope": "window"
         },
+        "nexus-sync.server.rejectDuplicates": {
+          "type": "boolean",
+          "default": false,
+          "description": "Rejects duplicate logs sent at the exact same time (< 100 ms apart)",
+          "scope": "window"
+        },
         "nexus-sync.workspace.projectFile": {
           "type": "string",
           "default": "default.project.json",

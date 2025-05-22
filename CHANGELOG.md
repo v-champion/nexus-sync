@@ -2,6 +2,10 @@
 
 All notable changes to Nexus Sync will be documented in this file.
 
+## `0.4.5` - May 22nd, 2024
+
+- Added a vscode setting to help prevent duplicated output logs
+
 ## `0.4.0` - December 22nd, 2024
 
 - Fixed a bug where sometimes linked scripts that have identical names but different paths couldn't be differentiated

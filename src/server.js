@@ -1,8 +1,10 @@
 const notification = require('./notification');
+const settings = require(`./settings`);
 const output = require('./output');
 const http = require('http');
 
 const contentType = { "Content-Type": "application/json" };
+const recentLogs = new Map();
 
 let outputSessions = new Map();
 let server;
@@ -22,13 +24,37 @@ function parseOutputLogs(body) {
     };
 }
 
+function isDuplicate(log) {
+    if (!settings.fetch('server', 'rejectDuplicates')) {
+        return false;
+    } else if (log.messageType === "MessageTrace" && log.message.includes("Stack ")) {
+        return false;
+    }
+
+    const sessionLogs = recentLogs.get("All") || [];
+    const now = log.timestamp;
+
+    const recentLogsOnly = sessionLogs.filter(entry => now - entry.timestamp <= 100);
+    const duplicateFound = recentLogsOnly.some(entry => entry.message === log.message);
+
+    if (!duplicateFound) {
+        recentLogsOnly.push({ message: log.message, timestamp: now });
+    } else {
+        console.debug(`[Duplicate] '${log.message}' seen at ${now}`);
+    }
+
+    recentLogs.set("All", recentLogsOnly);
+
+    return duplicateFound;
+}
+
 function sortOutputLogs(data) {
     const sortedLogs = Object.entries(data.logs).sort((a, b) => Number(a[0]) - Number(b[0]));
 
     sortedLogs.forEach(([key, log]) => {
         const logNumber = Number(key);
 
-        if (logNumber > outputSessions.get(data.GUID) && log !== null) {
+        if (logNumber > outputSessions.get(data.GUID) && log !== null && !isDuplicate(log)) {
             outputSessions.set(data.GUID, logNumber);
 
             if (log.timestamp >= data.startTime) {
@@ -69,6 +95,7 @@ function handleConnectError(error, port) {
 
 function start(port) {
     if (!isServerRunning()) {
+        recentLogs.clear();
         output.start();
 
         server = http.createServer((req, res) => {
