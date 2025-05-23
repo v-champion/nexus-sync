@@ -2,7 +2,7 @@
 
 All notable changes to Nexus Sync will be documented in this file.
 
-## `0.4.5` - May 22nd, 2024
+## `0.4.5` - May 22nd, 2025
 
 - Added a vscode setting to help prevent duplicated output logs
 
